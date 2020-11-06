@@ -63,11 +63,11 @@ func createCSV(result []jobObj) {
 
 func extractJob(job *goquery.Selection, c chan<- jobObj) {
 	jk, _ := job.Attr("data-jk")
-	title := cleanString(job.Find(".jobtitle").Text())
-	company := cleanString(job.Find(".company").Text())
-	location := cleanString(job.Find(".location").Text())
-	salary := cleanString(job.Find(".salaryText").Text())
-	summary := cleanString(job.Find(".summary").Text())
+	title := CleanString(job.Find(".jobtitle").Text())
+	company := CleanString(job.Find(".company").Text())
+	location := CleanString(job.Find(".location").Text())
+	salary := CleanString(job.Find(".salaryText").Text())
+	summary := CleanString(job.Find(".summary").Text())
 	c <- jobObj{jk, title, company, location, salary, summary}
 }
 
@@ -132,6 +132,6 @@ func checkStatusCode(res *http.Response) {
 	}
 }
 
-func cleanString(str string) string {
+func CleanString(str string) string {
 	return strings.Join(strings.Fields(strings.TrimSpace(str)), " ")
 }
