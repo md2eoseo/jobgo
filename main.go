@@ -60,19 +60,19 @@ func createCSV(result []jobObj) {
 	fmt.Println("complete")
 }
 
-func extractJob(job *goquery.Selection) jobObj {
+func extractJob(job *goquery.Selection, c chan<- jobObj) {
 	jk, _ := job.Attr("data-jk")
 	title := cleanString(job.Find(".jobtitle").Text())
 	company := cleanString(job.Find(".company").Text())
 	location := cleanString(job.Find(".location").Text())
 	salary := cleanString(job.Find(".salaryText").Text())
 	summary := cleanString(job.Find(".summary").Text())
-	return jobObj{jk, title, company, location, salary, summary}
+	c <- jobObj{jk, title, company, location, salary, summary}
 }
 
-// TODO: goroutine here
-func getPage(pageNum int, c chan []jobObj) {
+func getPage(pageNum int, mainC chan<- []jobObj) {
 	var result []jobObj
+	c := make(chan jobObj)
 	pageURL := baseURL + "&start=" + strconv.Itoa(pageNum)
 	res, err := http.Get(pageURL)
 	checkErr(err)
@@ -86,10 +86,16 @@ func getPage(pageNum int, c chan []jobObj) {
 	jobs := doc.Find(".jobsearch-SerpJobCard")
 
 	jobs.Each(func(i int, s *goquery.Selection) {
-		result = append(result, extractJob(s))
+		go extractJob(s, c)
+
 	})
 
-	c <- result
+	for i := 0; i < jobs.Length(); i++ {
+		job := <-c
+		result = append(result, job)
+	}
+
+	mainC <- result
 }
 
 func getPages() int {
