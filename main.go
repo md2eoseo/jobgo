@@ -24,7 +24,7 @@ func main() {
 
 func handleSearch(c echo.Context) error {
 	term := strings.ToLower(scrapper.CleanString(c.FormValue("term")))
-	fileName := term + "_" + strconv.Itoa(time.Now().Year()) + "_" + time.Now().Month().String() + ".csv"
+	fileName := strings.Replace(term, " ", "_", -1) + "_" + strconv.Itoa(time.Now().Year()) + "_" + time.Now().Month().String() + ".csv"
 	scrapper.Scrape(term)
 	defer os.Remove("jobs.csv")
 	return c.Attachment("jobs.csv", fileName)

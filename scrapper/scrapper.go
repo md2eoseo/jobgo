@@ -25,6 +25,7 @@ type jobObj struct {
 }
 
 func Scrape(term string) {
+	term = strings.Replace(term, " ", "+", -1)
 	var baseURL string = "https://kr.indeed.com/jobs?" + "q=" + term + "&limit=" + limit
 	var result []jobObj
 	c := make(chan []jobObj)
