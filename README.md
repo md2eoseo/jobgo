@@ -1,6 +1,6 @@
 # JobGo
 Job scrapper with Golang
-from [Indeed Korea](kr.indeed.com)
+from [Indeed Korea](https://kr.indeed.com)
 
 ## How to Use
 1. Run the server with command below.
