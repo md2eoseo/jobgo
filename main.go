@@ -26,10 +26,15 @@ type jobObj struct {
 
 func main() {
 	var result []jobObj
+	c := make(chan []jobObj)
 	totalPages := getPages()
 
 	for i := 0; i < totalPages; i++ {
-		result = append(result, getPage(i)...)
+		go getPage(i, c)
+	}
+	for i := 0; i < totalPages; i++ {
+		pageResult := <-c
+		result = append(result, pageResult...)
 	}
 
 	createCSV(result)
@@ -66,7 +71,7 @@ func extractJob(job *goquery.Selection) jobObj {
 }
 
 // TODO: goroutine here
-func getPage(pageNum int) []jobObj {
+func getPage(pageNum int, c chan []jobObj) {
 	var result []jobObj
 	pageURL := baseURL + "&start=" + strconv.Itoa(pageNum)
 	res, err := http.Get(pageURL)
@@ -84,7 +89,7 @@ func getPage(pageNum int) []jobObj {
 		result = append(result, extractJob(s))
 	})
 
-	return result
+	c <- result
 }
 
 func getPages() int {
